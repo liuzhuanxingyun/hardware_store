@@ -1,0 +1,39 @@
+<!--pages/category/category.wxml-->
+<view class="container-category">
+  <navigation-bar title="全部分类" back="{{false}}" background="#fff"></navigation-bar>
+  
+  <view class="content-wrapper">
+    <!-- 左侧侧边栏 -->
+    <scroll-view scroll-y class="left-sidebar">
+      <block wx:for="{{categories}}" wx:key="id">
+        <view 
+          class="sidebar-item {{currentTab === index ? 'active' : ''}}" 
+          bindtap="onTabTap" 
+          data-index="{{index}}">
+          <view class="sidebar-text">{{item.name}}</view>
+          <view class="active-line" wx:if="{{currentTab === index}}"></view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <!-- 右侧内容区 -->
+    <scroll-view scroll-y class="right-content">
+      <view class="category-banner">
+        <image src="/images/home1.jpg" mode="aspectFill"></image>
+      </view>
+      
+      <view class="section-title">
+        <text>{{categories[currentTab].name}}</text>
+      </view>
+
+      <view class="grid-list">
+        <block wx:for="{{subCategories[currentTab]}}" wx:key="name">
+          <view class="grid-item" bindtap="onItemTap" data-name="{{item.name}}">
+            <image class="item-img" src="{{item.icon}}" mode="aspectFit"></image>
+            <text class="item-name">{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+  </view>
+</view>

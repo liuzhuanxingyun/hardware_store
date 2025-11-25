@@ -1,0 +1,67 @@
+<!--pages/mine/mine.wxml-->
+<view class="container-mine">
+  <navigation-bar title="" back="{{false}}" background="transparent"></navigation-bar>
+
+  <!-- 头部背景 -->
+  <view class="header-bg">
+    <view class="user-card" bindtap="{{!hasUserInfo ? 'getUserProfile' : ''}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <view class="nickname">{{userInfo.nickName}}</view>
+        <view class="vip-badge" wx:if="{{hasUserInfo}}">
+          <text class="vip-icon">V</text> 尊享会员
+        </view>
+        <view class="login-tip" wx:else>点击登录，同步订单信息</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 订单区域 -->
+  <view class="section-card order-section">
+    <view class="section-header">
+      <text class="title">我的订单</text>
+      <view class="more-wrap">
+        <text class="more">全部订单</text>
+        <text class="arrow-right">></text>
+      </view>
+    </view>
+    <view class="order-grid">
+      <block wx:for="{{orderTypes}}" wx:key="name">
+        <view class="order-item">
+          <view class="icon-box">
+            <!-- 实际项目中建议使用 image 标签替换 view -->
+            <!-- <image src="/images/order_{{index}}.png" class="order-icon-img"></image> -->
+            <view class="icon-placeholder">{{item.name[0]}}</view>
+            <view class="badge" wx:if="{{item.count > 0}}">{{item.count}}</view>
+          </view>
+          <text class="order-name">{{item.name}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 菜单列表 -->
+  <view class="section-card menu-section">
+    <block wx:for="{{menuList}}" wx:key="name">
+      <!-- 通用内部结构 -->
+      <view class="menu-inner">
+        <view class="menu-left">
+          <!-- 如果没有图标，可以显示一个默认的圆点或隐藏 -->
+          <view class="menu-icon-box"></view> 
+          <text class="menu-name">{{item.name}}</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+
+      <!-- 覆盖点击层：根据类型判断 -->
+      <button 
+        class="btn-cover" 
+        open-type="{{item.type === 'contact' ? 'contact' : (item.type === 'feedback' ? 'feedback' : '')}}"
+        bindtap="{{(item.type !== 'contact' && item.type !== 'feedback') ? 'onMenuTap' : ''}}"
+        data-type="{{item.type}}"
+      ></button>
+    </block>
+  </view>
+  
+  <view class="version-info">v1.0.0 五金卫浴商城</view>
+</view>

@@ -1,0 +1,65 @@
+<!--pages/home/home.wxml-->
+<view class="container-main">
+  <!-- 1. 自定义导航栏 -->
+  <navigation-bar title="五金卫浴商城" back="{{false}}" background="#f7f9fb"></navigation-bar>
+
+  <view class="scroll-content">
+    <!-- 2. 搜索框区域 -->
+    <view class="search-wrapper">
+      <view class="search-bar">
+        <icon type="search" size="16" color="#999"></icon>
+        <text class="search-placeholder">搜索水龙头、花洒、螺丝...</text>
+      </view>
+    </view>
+
+    <!-- 3. 轮播图 -->
+    <swiper class="banner-swiper" indicator-dots indicator-active-color="#fff" autoplay interval="4000" circular>
+      <block wx:for="{{banners}}" wx:key="index">
+        <swiper-item>
+          <image class="banner-img" src="{{item}}" mode="aspectFill"></image>
+        </swiper-item>
+      </block>
+    </swiper>
+
+    <!-- 4. 金刚区（快捷分类） -->
+    <view class="category-grid">
+      <block wx:for="{{categories}}" wx:key="id">
+        <view class="category-item" bindtap="onCategoryTap" data-id="{{item.id}}">
+          <image class="category-icon" src="{{item.icon}}" mode="aspectFit"></image>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- 5. 推荐商品 -->
+    <view class="section-header">
+      <text class="section-title">热销推荐</text>
+      <text class="section-more">查看全部 ></text>
+    </view>
+    
+    <view class="goods-list">
+      <block wx:for="{{goodsList}}" wx:key="id">
+        <view class="goods-item" bindtap="onGoodsTap" data-id="{{item.id}}">
+          <view class="goods-img-box">
+            <image class="goods-img" src="{{item.img}}" mode="aspectFill"></image>
+          </view>
+          <view class="goods-info">
+            <view class="goods-name">{{item.name}}</view>
+            <view class="goods-tags" wx:if="{{item.tag}}">
+              <text class="tag">{{item.tag}}</text>
+            </view>
+            <view class="goods-bottom">
+              <view class="goods-price">
+                <text class="symbol">￥</text>{{item.price}}
+              </view>
+              <view class="add-btn">+</view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+    
+    <!-- 底部留白，防止被TabBar遮挡，增加高度 -->
+    <view style="height: 120rpx;"></view>
+  </view>
+</view>

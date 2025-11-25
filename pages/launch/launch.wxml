@@ -1,0 +1,7 @@
+<!--pages/launch/launch.wxml-->
+<view class="launch-bg">
+  <view class="master-photo-wrapper">
+    <image class="master-photo" src="/images/launch.jpg" mode="aspectFill"></image>
+  </view>
+  <view class="welcome-text">欢迎来到水龙头五金卫浴！</view>
+</view>

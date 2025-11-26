@@ -14,9 +14,11 @@
 
     <!-- 3. 轮播图 -->
     <swiper class="banner-swiper" indicator-dots indicator-active-color="#fff" autoplay interval="4000" circular>
-      <block wx:for="{{banners}}" wx:key="index">
+      <!-- 注意：这里 wx:key 最好改成 id，因为后端返回的数据里有 id -->
+      <block wx:for="{{banners}}" wx:key="id">
         <swiper-item>
-          <image class="banner-img" src="{{item}}" mode="aspectFill"></image>
+          <!-- 核心修改：src="{{item}}" 改为 src="{{item.img}}" -->
+          <image class="banner-img" src="{{item.img}}" mode="aspectFill"></image>
         </swiper-item>
       </block>
     </swiper>

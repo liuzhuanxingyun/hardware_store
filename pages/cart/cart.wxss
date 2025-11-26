@@ -1,48 +1,59 @@
 /* pages/cart/cart.wxss */
 .container-cart {
-  min-height: 100vh;
-  background: #f7f9fb;
-  padding-bottom: 100rpx; /* 留出底部栏高度 */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+/* 防止导航栏被压缩 */
+navigation-bar {
+  flex: none;
+  z-index: 999;
 }
 
 .cart-list {
-  padding: 20rpx 24rpx;
-  box-sizing: border-box;
-  height: calc(100vh - 100rpx); /* 减去底部栏 */
+  flex: 1;
+  overflow-y: auto;
+  /* 底部留白，防止内容被结算栏遮挡 */
+  padding-bottom: 220rpx; 
 }
 
 .cart-item {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 24rpx;
   display: flex;
   align-items: center;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.03);
+  background-color: #fff;
+  margin: 20rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
 }
 
 .checkbox-area {
-  padding-right: 20rpx;
+  width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .goods-img {
   width: 160rpx;
   height: 160rpx;
   border-radius: 12rpx;
-  background: #f8f8f8;
-  margin-right: 24rpx;
+  margin-right: 20rpx;
+  background-color: #eee;
+  flex-shrink: 0;
 }
 
-/* 修改 goods-info 布局 */
 .goods-info {
   flex: 1;
-  height: 160rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: relative; /* 为删除按钮定位 */
+  height: 160rpx;
+  overflow: hidden;
 }
 
+/* 顶部区域：标题 + 删除按钮 */
 .info-top {
   display: flex;
   justify-content: space-between;
@@ -52,46 +63,46 @@
 .goods-title {
   font-size: 28rpx;
   color: #333;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  padding-right: 60rpx; /* 留出删除按钮空间 */
-  line-height: 1.3;
+  overflow: hidden;
+  flex: 1;
+  margin-right: 10rpx;
 }
 
+/* 删除按钮样式 */
 .delete-btn {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #999;
   padding: 0 10rpx;
-  position: absolute;
-  top: 0;
-  right: 0;
+  flex-shrink: 0;
 }
 
 .goods-spec {
   font-size: 22rpx;
   color: #999;
-  background: #f5f5f5;
+  background-color: #f9f9f9;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
   align-self: flex-start;
+  margin-top: 8rpx;
 }
 
 .goods-bottom {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .price {
-  color: #ff4d4f;
+  color: #ff6b00;
   font-size: 32rpx;
   font-weight: bold;
 }
 
-/* 步进器 */
+/* 步进器样式 */
 .stepper {
   display: flex;
   align-items: center;
@@ -102,10 +113,11 @@
 .step-btn {
   width: 50rpx;
   height: 44rpx;
-  line-height: 44rpx;
-  text-align: center;
-  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #666;
+  font-size: 32rpx;
 }
 
 .step-num {
@@ -118,62 +130,62 @@
   line-height: 44rpx;
 }
 
-/* 底部栏 */
+.empty-cart {
+  padding-top: 200rpx;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 底部结算栏 */
 .footer-bar {
   position: fixed;
-  bottom: 0; /* 如果有TabBar，这里可能需要调整，通常小程序TabBar会自动处理，但自定义TabBar需要注意 */
+  /* 位于自定义 TabBar 之上 (TabBar 高度约 48px + safe-area) */
+  bottom: calc(env(safe-area-inset-bottom) + 48px); 
   left: 0;
-  width: 100%;
+  right: 0;
   height: 100rpx;
-  background: #fff;
+  background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24rpx;
-  box-sizing: border-box;
+  padding: 0 20rpx;
   box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
   z-index: 100;
-  /* 删除下面这一行，TabBar页面不需要为内容区底部元素添加安全距离 */
-  /* padding-bottom: env(safe-area-inset-bottom); */
 }
 
 .select-all {
   display: flex;
   align-items: center;
+  font-size: 28rpx;
+  color: #666;
 }
 
 .all-text {
-  font-size: 26rpx;
-  color: #666;
-  margin-left: 12rpx;
+  margin-left: 10rpx;
 }
 
 .total-info {
   flex: 1;
   text-align: right;
-  margin-right: 24rpx;
-  font-size: 26rpx;
+  margin-right: 20rpx;
+  font-size: 28rpx;
 }
 
 .total-price {
-  color: #ff4d4f;
+  color: #ff6b00;
   font-size: 36rpx;
   font-weight: bold;
 }
 
 .checkout-btn {
   width: 200rpx;
-  height: 72rpx;
-  background: #ff6b00;
+  height: 76rpx;
+  background: linear-gradient(90deg, #ff7500, #ff4b00);
   color: #fff;
-  text-align: center;
-  line-height: 72rpx;
-  border-radius: 36rpx;
-  font-size: 28rpx;
-}
-
-.empty-cart {
-  text-align: center;
-  padding-top: 200rpx;
-  color: #999;
+  border-radius: 38rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
 }

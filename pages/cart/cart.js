@@ -10,7 +10,9 @@ Page({
   },
 
   onShow() {
-    this.calculateTotal();
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 2 })
+    }
   },
 
   // 切换单选

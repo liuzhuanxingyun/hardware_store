@@ -13,6 +13,7 @@
     "navigationStyle": "custom"
   },
   "tabBar": {
+    "custom": true,
     "color": "#999999",
     "selectedColor": "#ff6b00",
     "backgroundColor": "#ffffff",
@@ -20,27 +21,19 @@
     "list": [
       {
         "pagePath": "pages/home/home",
-        "text": "首页",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home-selection.png"
+        "text": "首页"
       },
       {
         "pagePath": "pages/category/category",
-        "text": "分类",
-        "iconPath": "images/category.png",
-        "selectedIconPath": "images/category-selection.png"
+        "text": "分类"
       },
       {
         "pagePath": "pages/cart/cart",
-        "text": "购物车",
-        "iconPath": "images/cart.png",
-        "selectedIconPath": "images/cart-selection.png"
+        "text": "购物车"
       },
       {
         "pagePath": "pages/mine/mine",
-        "text": "我的",
-        "iconPath": "images/my.png",
-        "selectedIconPath": "images/my-selection.png"
+        "text": "我的"
       }
     ]
   },

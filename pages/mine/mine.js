@@ -67,5 +67,11 @@ Page({
     } else if (type === 'setting') {
       wx.showToast({ title: '打开设置', icon: 'none' });
     }
+  },
+
+  onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 3 })
+    }
   }
 })

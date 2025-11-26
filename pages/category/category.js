@@ -55,6 +55,9 @@ Page({
       // 跳转完成后，清空全局变量，以免影响后续正常点击 TabBar
       app.globalData.categoryIndex = null;
     }
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 })
+    }
   },
 
   onItemTap(e) {

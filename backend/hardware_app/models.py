@@ -70,3 +70,20 @@ class Goods(models.Model):
     def __str__(self):
         return self.name
 
+# 新增：底部导航栏模型
+class TabBar(models.Model):
+    name = models.CharField(max_length=50, verbose_name="Tab名称")
+    page_path = models.CharField(max_length=100, verbose_name="页面路径", help_text="例如: /pages/home/home")
+    icon = models.ImageField(upload_to='tabbar/', verbose_name="未选中图标")
+    selected_icon = models.ImageField(upload_to='tabbar/', verbose_name="选中图标")
+    order = models.PositiveIntegerField(default=0, verbose_name="排序")
+    is_active = models.BooleanField(default=True, verbose_name="是否启用")
+
+    class Meta:
+        verbose_name = "底部导航配置"
+        verbose_name_plural = verbose_name
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name
+

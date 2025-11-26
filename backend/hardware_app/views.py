@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Welcome, Banner, Category, Goods # 记得导入新模型
+from .models import Welcome, Banner, Category, Goods, TabBar # 引入 TabBar
 from django.http import JsonResponse
 
 def welcome(request):
@@ -95,3 +95,20 @@ def goods_detail(request):
         'detailImages': detail_images
     }
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': result})
+
+# 4. 获取底部导航栏列表
+def tabbar_list(request):
+    tabs = TabBar.objects.filter(is_active=True).order_by('order')
+    data = []
+    for t in tabs:
+        # 拼接完整图片链接
+        icon_url = f"http://127.0.0.1:8000/backend/media/{t.icon}" if t.icon else ""
+        selected_icon_url = f"http://127.0.0.1:8000/backend/media/{t.selected_icon}" if t.selected_icon else ""
+        
+        data.append({
+            'pagePath': t.page_path,
+            'text': t.name,
+            'iconPath': icon_url,
+            'selectedIconPath': selected_icon_url
+        })
+    return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})

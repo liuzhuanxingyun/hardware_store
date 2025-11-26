@@ -1,0 +1,52 @@
+<view class="container-detail">
+  <!-- 保留这一行即可 -->
+  <navigation-bar title="商品详情" back="{{true}}" color="#000" background="#fff"></navigation-bar>
+
+  <scroll-view scroll-y class="content-scroll">
+    <!-- 轮播图 -->
+    <swiper class="detail-swiper" indicator-dots autoplay circular indicator-active-color="#ff6b00">
+      <block wx:for="{{goods.detailImages}}" wx:key="*this">
+        <swiper-item>
+          <image src="{{item}}" mode="aspectFill" class="slide-image" />
+        </swiper-item>
+      </block>
+    </swiper>
+
+    <!-- 基本信息 -->
+    <view class="info-box">
+      <view class="price-row">
+        <text class="symbol">￥</text>
+        <text class="price">{{goods.price}}</text>
+      </view>
+      <view class="title">{{goods.name}}</view>
+    </view>
+
+    <!-- 详情介绍 -->
+    <view class="detail-box">
+      <view class="section-title">商品详情</view>
+      <view class="desc-text">{{goods.description}}</view>
+      <block wx:for="{{goods.detailImages}}" wx:key="*this">
+        <image src="{{item}}" mode="widthFix" class="detail-img" />
+      </block>
+    </view>
+    
+    <!-- 底部垫高 -->
+    <view style="height: 120rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="icon-btn" bindtap="goHome"> <!-- 添加返回首页事件 -->
+      <image src="/images/home.png" mode="aspectFit" />
+      <text>首页</text>
+    </view>
+    <view class="icon-btn">
+      <image src="/images/cart.png" mode="aspectFit" />
+      <text>购物车</text>
+    </view>
+    <view class="btn-group">
+      <view class="btn add-cart" bindtap="addToCart">加入购物车</view>
+      <view class="btn buy-now" bindtap="buyNow">立即购买</view>
+    </view>
+  </view>
+</view>

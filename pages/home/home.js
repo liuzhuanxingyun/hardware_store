@@ -12,23 +12,20 @@ Page({
       { id: 3, name: '五金杂项', icon: '/images/icon_hardware.jpg' },
       { id: 4, name: '常备工具', icon: '/images/icon_tool.jpg' }
     ],
-    goodsList: [
-      { id: 1, name: '全铜冷热面盆水龙头 家用洗脸盆防溅水', price: 399, img: '/images/goods1.png', tag: '热销' },
-      { id: 2, name: '增压淋浴花洒套装 恒温数显黑色大喷头', price: 128, img: '/images/goods2.jpg', tag: '新品' },
-      { id: 3, name: '304不锈钢波纹管 防爆耐高温进水软管', price: 66, img: '/images/goods3.jpg', tag: '' },
-      { id: 4, name: '多功能活动扳手 卫浴安装专用工具', price: 45, img: '/images/goods1.jpg', tag: '特价' }
-    ]
+    goodsList: [] // 修改处：清空这里的假数据，等待接口填充
   },
 
   // 点击商品跳转详情
   onGoodsTap(e) {
     const id = e.currentTarget.dataset.id;
-    wx.showToast({
-      title: '查看商品ID: ' + id,
-      icon: 'none'
-    })
-    // 实际开发中：
-    // wx.navigateTo({ url: `/pages/goods-detail/index?id=${id}` })
+    // 查找当前点击的商品数据
+    const goods = this.data.goodsList.find(item => item.id === id);
+    
+    if (goods) {
+      wx.navigateTo({
+        url: `/pages/goods_detail/goods_detail?id=${goods.id}&name=${encodeURIComponent(goods.name)}&price=${goods.price}&img=${encodeURIComponent(goods.img)}`
+      });
+    }
   },
 
   // 点击分类
@@ -54,6 +51,8 @@ Page({
   onLoad(options) {
     // 2. 页面加载时，调用获取轮播图的方法
     this.getBanners();
+    // 修改处：调用获取商品列表的方法
+    this.getGoodsList();
   },
 
   // 3. 新增：获取轮播图数据的方法
@@ -72,6 +71,26 @@ Page({
       },
       fail: (err) => {
         console.error('轮播图请求失败', err);
+      }
+    })
+  },
+
+  // 修改处：新增获取商品列表的方法
+  getGoodsList() {
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/goods/list/',
+      method: 'GET',
+      // data: { is_hot: 'true' }, // 如果只想显示勾选了“是否热销”的商品，可以加上这行
+      success: (res) => {
+        console.log('商品列表获取成功：', res.data);
+        if (res.data.code === 200) {
+          this.setData({
+            goodsList: res.data.result
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('商品列表请求失败', err);
       }
     })
   },

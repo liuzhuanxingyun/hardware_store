@@ -59,9 +59,18 @@ Page({
 
   onItemTap(e) {
     const name = e.currentTarget.dataset.name;
-    wx.showToast({
-      title: '点击了: ' + name,
-      icon: 'none'
+    // 查找商品图片
+    let img = '';
+    for(let group of this.data.subCategories) {
+        const found = group.find(item => item.name === name);
+        if(found) {
+            img = found.icon;
+            break;
+        }
+    }
+
+    wx.navigateTo({
+      url: `/pages/goods_detail/goods_detail?name=${encodeURIComponent(name)}&img=${encodeURIComponent(img)}&price=99.00` // 默认价格
     });
   }
 })

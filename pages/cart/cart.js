@@ -98,5 +98,14 @@ Page({
       return;
     }
     wx.showToast({ title: '去结算...', icon: 'none' });
+  },
+
+  // 跳转详情
+  onGoodsTap(e) {
+    const index = e.currentTarget.dataset.index;
+    const goods = this.data.cartList[index];
+    wx.navigateTo({
+      url: `/pages/goods/goods?id=${goods.id}`
+    });
   }
 })

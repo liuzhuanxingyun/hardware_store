@@ -1,0 +1,146 @@
+/* pages/goods_detail/goods_detail.wxss */
+.container-detail {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  position: relative; /* 确保子元素定位基准 */
+}
+
+/* 新增：确保导航栏不被压缩，且层级最高 */
+navigation-bar {
+  flex: none; /* 禁止被 Flex 布局压缩 */
+  z-index: 9999; /* 确保在最上层 */
+  position: relative;
+}
+
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  /* 确保内容在导航栏下方 */
+  position: relative;
+  z-index: 1;
+}
+
+.detail-swiper {
+  width: 100%;
+  height: 750rpx; /* 正方形大图 */
+  background-color: #fff;
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+}
+
+.info-box {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.price-row {
+  color: #ff6b00;
+  font-size: 48rpx; /* 价格加大 */
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: baseline;
+}
+
+.symbol {
+  font-size: 28rpx;
+  margin-right: 4rpx;
+}
+
+.title {
+  font-size: 34rpx;
+  color: #333;
+  line-height: 1.5;
+  font-weight: 600; /* 标题加粗 */
+}
+
+.detail-box {
+  background-color: #fff;
+  padding: 30rpx;
+  padding-bottom: 60rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  padding-left: 16rpx;
+  border-left: 8rpx solid #ff6b00;
+}
+
+.desc-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 30rpx;
+  text-align: justify;
+}
+
+.detail-img {
+  width: 100%;
+  display: block;
+  margin-bottom: 0; /* 图片之间无缝隙 */
+}
+
+.bottom-bar {
+  height: 110rpx; /* 稍微加高 */
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 20rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+  padding-bottom: env(safe-area-inset-bottom);
+  position: relative;
+  z-index: 100;
+}
+
+.icon-btn {
+  width: 100rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  color: #666;
+}
+
+.icon-btn image {
+  width: 44rpx;
+  height: 44rpx;
+  margin-bottom: 6rpx;
+}
+
+.btn-group {
+  flex: 1;
+  display: flex;
+  margin-left: 20rpx;
+  height: 80rpx;
+}
+
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.add-cart {
+  background: linear-gradient(90deg, #ffcb00, #ff9402);
+  border-top-left-radius: 40rpx;
+  border-bottom-left-radius: 40rpx;
+}
+
+.buy-now {
+  background: linear-gradient(90deg, #ff7500, #ff4b00);
+  border-top-right-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+}

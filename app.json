@@ -5,7 +5,8 @@
     "pages/home/home",
     "pages/category/category",
     "pages/cart/cart",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/goods_detail/goods_detail"
   ],
   "window": {
     "navigationBarTextStyle": "black",

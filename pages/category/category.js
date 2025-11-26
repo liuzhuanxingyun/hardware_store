@@ -42,6 +42,21 @@ Page({
     });
   },
 
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow() {
+    const app = getApp();
+    // 检查全局变量中是否有指定的索引
+    if (app.globalData.categoryIndex !== null && app.globalData.categoryIndex !== undefined) {
+      this.setData({
+        currentTab: app.globalData.categoryIndex
+      });
+      // 跳转完成后，清空全局变量，以免影响后续正常点击 TabBar
+      app.globalData.categoryIndex = null;
+    }
+  },
+
   onItemTap(e) {
     const name = e.currentTarget.dataset.name;
     wx.showToast({

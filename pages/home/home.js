@@ -40,7 +40,15 @@ Page({
   // 点击分类
   onCategoryTap(e) {
     const id = e.currentTarget.dataset.id;
-    // 切换到分类Tab
+    
+    // 1. 计算索引：你的 id 是 1,2,3,4，而 tab 索引是 0,1,2,3，所以减 1
+    const targetIndex = id - 1;
+
+    // 2. 存入全局变量
+    const app = getApp();
+    app.globalData.categoryIndex = targetIndex;
+
+    // 3. 切换到分类Tab
     wx.switchTab({
       url: '/pages/category/category'
     })

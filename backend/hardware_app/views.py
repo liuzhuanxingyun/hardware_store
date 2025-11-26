@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Welcome, Banner, Category, Goods, TabBar # 引入 TabBar
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate
+import json
 
 def welcome(request):
     res = Welcome.objects.all().order_by('-order').first()
@@ -112,3 +115,35 @@ def tabbar_list(request):
             'selectedIconPath': selected_icon_url
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
+
+# 新增：用户登录接口
+@csrf_exempt
+def login_user(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+        except:
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+
+        if not username or not password:
+             return JsonResponse({'code': 400, 'msg': '请输入用户名和密码'})
+
+        # 使用 Django 自带的验证功能
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            return JsonResponse({
+                'code': 200, 
+                'msg': '登录成功', 
+                'result': {
+                    'id': user.id,
+                    'username': user.username,
+                    'is_superuser': user.is_superuser,
+                    # 这里还可以返回更多信息，比如头像等
+                }
+            })
+        else:
+            return JsonResponse({'code': 401, 'msg': '账号或密码错误'})
+    return JsonResponse({'code': 405, 'msg': 'Method not allowed'})

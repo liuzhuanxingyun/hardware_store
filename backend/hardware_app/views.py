@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
 import requests # 记得导入 requests
-from .models import Welcome, Banner, Category, Goods, TabBar, CartItem # 引入 CartItem
+from .models import Welcome, Banner, Category, Goods, TabBar, CartItem, Address # 引入 Address
 from dotenv import load_dotenv
 import os
 
@@ -274,3 +274,64 @@ def wechat_login(request):
             return JsonResponse({'code': 500, 'msg': '服务器内部错误', 'error': str(e)})
             
     return JsonResponse({'code': 405, 'msg': '方法不允许'})
+
+# --- 新增：地址管理接口 ---
+
+# 10. 获取地址列表
+def address_list(request):
+    user_id = request.GET.get('user_id')
+    addresses = Address.objects.filter(user_id=user_id)
+    data = []
+    for addr in addresses:
+        data.append({
+            'id': addr.id,
+            'name': addr.name,
+            'phone': addr.phone,
+            'region': addr.region.split(' '), # 转为数组供前端picker使用
+            'region_str': addr.region,        # 字符串供展示
+            'detail': addr.detail,
+            'is_default': addr.is_default
+        })
+    return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
+
+# 11. 保存地址（新增或修改）
+@csrf_exempt
+def address_save(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        addr_id = data.get('id')
+        user_id = data.get('user_id')
+        name = data.get('name')
+        phone = data.get('phone')
+        region_list = data.get('region', [])
+        region = " ".join(region_list) if isinstance(region_list, list) else region_list
+        detail = data.get('detail')
+        is_default = data.get('is_default', False)
+
+        # 如果设为默认，先将该用户其他地址设为非默认
+        if is_default:
+            Address.objects.filter(user_id=user_id).update(is_default=False)
+
+        if addr_id:
+            # 更新
+            Address.objects.filter(id=addr_id).update(
+                name=name, phone=phone, region=region, detail=detail, is_default=is_default
+            )
+        else:
+            # 新增：如果是第一条地址，强制设为默认
+            if not Address.objects.filter(user_id=user_id).exists():
+                is_default = True
+            
+            Address.objects.create(
+                user_id=user_id, name=name, phone=phone, region=region, detail=detail, is_default=is_default
+            )
+        
+        return JsonResponse({'code': 200, 'msg': '保存成功'})
+
+# 12. 删除地址
+@csrf_exempt
+def address_delete(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        Address.objects.filter(id=data.get('id')).delete()
+        return JsonResponse({'code': 200, 'msg': '删除成功'})

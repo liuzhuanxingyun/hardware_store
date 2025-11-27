@@ -43,8 +43,10 @@ Page({
   onMenuTap(e) {
     const type = e.currentTarget.dataset.type;
     if (type === 'address') {
-      // 微信原生收货地址管理
-      wx.chooseAddress({});
+      // 修改：跳转到自定义地址列表页
+      wx.navigateTo({
+        url: '/pages/address_list/address_list'
+      });
     } else if (type === 'orders') {
       wx.showToast({ title: '暂无订单记录', icon: 'none' });
     } else if (type === 'contact') {

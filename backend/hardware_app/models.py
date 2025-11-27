@@ -54,7 +54,7 @@ class Category(models.Model):
 class Goods(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='goods', verbose_name="所属分类")
     name = models.CharField(max_length=200, verbose_name="商品名称")
-    price = models.DecimalField(max_digits=10, decimal_places=3, verbose_name="价格")
+    price = models.DecimalField(max_digits=10, decimal_places=1, verbose_name="价格")
     img = models.ImageField(upload_to='goods/', default='goods/default.png', verbose_name="主图")
     description = models.TextField(verbose_name="商品详情", blank=True)
     stock = models.PositiveIntegerField(default=100, verbose_name="库存")
@@ -116,4 +116,22 @@ class CartItem(models.Model):
         verbose_name = "购物车"
         verbose_name_plural = verbose_name
         ordering = ['-created_at']
+
+# 新增：收货地址模型
+class Address(models.Model):
+    user_id = models.CharField(max_length=100, verbose_name="用户ID")
+    name = models.CharField(max_length=50, verbose_name="收货人")
+    phone = models.CharField(max_length=20, verbose_name="手机号")
+    region = models.CharField(max_length=100, verbose_name="所在地区") # 格式："广东省 广州市 天河区"
+    detail = models.CharField(max_length=200, verbose_name="详细地址")
+    is_default = models.BooleanField(default=False, verbose_name="是否默认")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = "收货地址"
+        verbose_name_plural = verbose_name
+        ordering = ['-is_default', '-created_at'] # 默认地址排在最前
+
+    def __str__(self):
+        return f"{self.name} - {self.phone}"
 

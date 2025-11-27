@@ -60,15 +60,34 @@ Component({
   lifetimes: {
     attached() {
       const rect = wx.getMenuButtonBoundingClientRect()
-      const platform = (wx.getDeviceInfo() || wx.getSystemInfoSync()).platform
-      const isAndroid = platform === 'android'
-      const isDevtools = platform === 'devtools'
-      const { windowWidth, safeArea: { top = 0, bottom = 0 } = {} } = wx.getWindowInfo() || wx.getSystemInfoSync()
+      const systemInfo = wx.getWindowInfo() || wx.getSystemInfoSync()
+      
+      const statusBarHeight = systemInfo.statusBarHeight
+      const windowWidth = systemInfo.windowWidth
+      
+      // 胶囊按钮位置信息兜底（防止获取失败）
+      const menuButtonTop = rect.top || (statusBarHeight + 4)
+      const menuButtonHeight = rect.height || 32
+      const menuButtonLeft = rect.left || (windowWidth - 97) // 假设胶囊宽87+右边距10
+
+      // 核心公式：导航栏内容高度 = (胶囊顶部 - 状态栏高度) * 2 + 胶囊高度
+      // 这样可以保证内容区域垂直居中于胶囊按钮
+      let navBarHeight = (menuButtonTop - statusBarHeight) * 2 + menuButtonHeight
+      
+      // 异常兜底
+      if (!navBarHeight || navBarHeight < 0) {
+        navBarHeight = 44
+      }
+
+      // 计算左右对称的留白宽度：屏幕宽度 - 胶囊左边界
+      // 这样左侧占位宽度 = 右侧胶囊+边距宽度，中间标题就能绝对居中
+      const sideWidth = windowWidth - menuButtonLeft
+
       this.setData({
-        ios: !isAndroid,
-        innerPaddingRight: `padding-right: ${windowWidth - rect.left}px`,
-        leftWidth: `width: ${windowWidth - rect.left}px`,
-        safeAreaTop: isDevtools || isAndroid ? `height: calc(var(--height) + ${top}px); padding-top: ${top}px` : ``
+        innerPaddingRight: `padding-right: ${sideWidth}px`,
+        leftWidth: `width: ${sideWidth}px`,
+        // 强制设置高度和padding，覆盖CSS中的模糊计算
+        safeAreaTop: `height: ${statusBarHeight + navBarHeight}px; padding-top: ${statusBarHeight}px`
       })
     },
   },

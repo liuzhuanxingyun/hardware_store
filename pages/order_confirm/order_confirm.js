@@ -29,7 +29,38 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
+    // --- 新增：加载结算商品 ---
+    const items = wx.getStorageSync('checkoutItems');
+    if (items) {
+      this.setData({ orderItems: items });
+      this.calculateTotal();
+    }
+    // -----------------------
 
+    // 1. 优先检查是否有从地址列表选中的地址
+    const selectedAddr = wx.getStorageSync('selectedAddress');
+    if (selectedAddr) {
+      this.setData({ address: selectedAddr });
+      wx.removeStorageSync('selectedAddress'); //以此为一次性选择
+    } else if (!this.data.address) {
+      // 2. 如果没有，则从后端获取默认地址
+      this.getDefaultAddress();
+    }
+  },
+
+  getDefaultAddress() {
+    const userId = wx.getStorageSync('openid') || 'test_user';
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/address/list/',
+      data: { user_id: userId },
+      success: (res) => {
+        if (res.data.code === 200 && res.data.result.length > 0) {
+          // 找到默认地址，或者取第一个
+          const defaultAddr = res.data.result.find(item => item.is_default) || res.data.result[0];
+          this.setData({ address: defaultAddr });
+        }
+      }
+    });
   },
 
   /**
@@ -79,16 +110,11 @@ Page({
   },
 
   /**
-   * 选择地址（调用微信原生收货地址接口）
+   * 选择地址（修改为跳转自定义页面）
    */
   chooseAddress() {
-    wx.chooseAddress({
-      success: (res) => {
-        this.setData({ address: res });
-      },
-      fail: (err) => {
-        console.log('用户取消选择地址', err);
-      }
+    wx.navigateTo({
+      url: '/pages/address_list/address_list?source=order'
     });
   },
 

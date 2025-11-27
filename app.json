@@ -7,7 +7,9 @@
     "pages/cart/cart",
     "pages/mine/mine",
     "pages/goods_detail/goods_detail",
-    "pages/order_confirm/order_confirm"
+    "pages/order_confirm/order_confirm",
+    "pages/address_list/address_list",
+    "pages/address_edit/address_edit"
   ],
   "window": {
     "navigationBarTextStyle": "black",

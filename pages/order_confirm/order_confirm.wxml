@@ -7,11 +7,13 @@
     <view class="address-box" bindtap="chooseAddress">
       <view class="address-info" wx:if="{{address}}">
         <view class="user-row">
-          <text class="name">{{address.userName}}</text>
-          <text class="phone">{{address.telNumber}}</text>
+          <!-- 修改字段名适配后端数据 -->
+          <text class="name">{{address.name}}</text>
+          <text class="phone">{{address.phone}}</text>
         </view>
         <view class="address-text">
-          {{address.provinceName}}{{address.cityName}}{{address.countyName}}{{address.detailInfo}}
+          <!-- 修改地址展示方式 -->
+          {{address.region_str || address.region}} {{address.detail}}
         </view>
       </view>
       <view class="address-empty" wx:else>

@@ -1,0 +1,33 @@
+<view class="container-address">
+  <!-- 1. 自定义导航栏 -->
+  <navigation-bar title="收货地址" back="{{true}}" color="#000" background="#fff"></navigation-bar>
+
+  <!-- 2. 滚动内容区 -->
+  <scroll-view scroll-y class="content-scroll">
+    <view class="list-wrapper">
+      <block wx:for="{{addressList}}" wx:key="id">
+        <view class="address-item" bindtap="onSelect" data-item="{{item}}">
+          <view class="info">
+            <view class="row">
+              <text class="name">{{item.name}}</text>
+              <text class="phone">{{item.phone}}</text>
+              <text wx:if="{{item.is_default}}" class="tag">默认</text>
+            </view>
+            <view class="detail">{{item.region_str}} {{item.detail}}</view>
+          </view>
+          <view class="edit-btn" catchtap="onEdit" data-item="{{item}}">编辑</view>
+        </view>
+      </block>
+
+      <!-- 空状态提示 -->
+      <view wx:if="{{addressList.length === 0}}" class="empty-state">
+        <text>暂无收货地址</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 3. 底部固定按钮 -->
+  <view class="footer">
+    <button class="add-btn" bindtap="onAdd">新增收货地址</button>
+  </view>
+</view>

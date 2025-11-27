@@ -23,16 +23,24 @@
       </view>
       
       <view class="section-title">
-        <text>{{categories[currentTab].name}}</text>
+        <!-- 增加判断，防止数组越界报错 -->
+        <text wx:if="{{categories[currentTab]}}">{{categories[currentTab].name}}</text>
       </view>
 
       <view class="grid-list">
-        <block wx:for="{{subCategories[currentTab]}}" wx:key="name">
-          <view class="grid-item" bindtap="onItemTap" data-name="{{item.name}}">
-            <image class="item-img" src="{{item.icon}}" mode="aspectFit"></image>
+        <!-- 修改：遍历 currentGoodsList -->
+        <block wx:for="{{currentGoodsList}}" wx:key="id">
+          <view class="grid-item" bindtap="onItemTap" data-id="{{item.id}}">
+            <!-- 修改：图片字段改为 item.img -->
+            <image class="item-img" src="{{item.img}}" mode="aspectFit"></image>
             <text class="item-name">{{item.name}}</text>
           </view>
         </block>
+        
+        <!-- 空状态提示 -->
+        <view wx:if="{{currentGoodsList.length === 0}}" style="text-align: center; color: #999; padding: 20px;">
+          <text>暂无商品</text>
+        </view>
       </view>
     </scroll-view>
   </view>

@@ -6,12 +6,7 @@ Page({
    */
   data: {
     banners: [],
-    categories: [
-      { id: 1, name: '卫浴龙头', icon: '/images/icon_faucet.jpg' },
-      { id: 2, name: '水电材料', icon: '/images/icon_material.jpg' },
-      { id: 3, name: '五金杂项', icon: '/images/icon_hardware.jpg' },
-      { id: 4, name: '常备工具', icon: '/images/icon_tool.jpg' }
-    ],
+    categories: [], // 修改：初始化为空数组，等待后端获取
     goodsList: [],
     
     // --- 新增：弹窗相关数据 ---
@@ -129,17 +124,19 @@ Page({
   onCategoryTap(e) {
     const id = e.currentTarget.dataset.id;
     
-    // 1. 计算索引：你的 id 是 1,2,3,4，而 tab 索引是 0,1,2,3，所以减 1
-    const targetIndex = id - 1;
+    // 修改：动态查找索引，而不是简单减1，防止ID不连续导致错误
+    const targetIndex = this.data.categories.findIndex(item => item.id === id);
 
-    // 2. 存入全局变量
-    const app = getApp();
-    app.globalData.categoryIndex = targetIndex;
+    if (targetIndex !== -1) {
+      // 2. 存入全局变量
+      const app = getApp();
+      app.globalData.categoryIndex = targetIndex;
 
-    // 3. 切换到分类Tab
-    wx.switchTab({
-      url: '/pages/category/category'
-    })
+      // 3. 切换到分类Tab
+      wx.switchTab({
+        url: '/pages/category/category'
+      })
+    }
   },
 
   /**
@@ -148,8 +145,29 @@ Page({
   onLoad(options) {
     // 2. 页面加载时，调用获取轮播图的方法
     this.getBanners();
+    // 新增：调用获取分类列表的方法
+    this.getCategories();
     // 修改处：调用获取商品列表的方法
     this.getGoodsList();
+  },
+
+  // 新增：获取分类列表的方法
+  getCategories() {
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/category/list/',
+      method: 'GET',
+      success: (res) => {
+        console.log('分类数据获取成功：', res.data);
+        if (res.data.code === 200) {
+          this.setData({
+            categories: res.data.result
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('分类请求失败', err);
+      }
+    })
   },
 
   // 3. 新增：获取轮播图数据的方法

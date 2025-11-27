@@ -5,14 +5,21 @@ Page({
    * 页面的初始数据
    */
   data: {
-    banners: [], // 1. 把这里的假数据清空，留个空数组即可，等待后端填入
+    banners: [],
     categories: [
       { id: 1, name: '卫浴龙头', icon: '/images/icon_faucet.jpg' },
       { id: 2, name: '水电材料', icon: '/images/icon_material.jpg' },
       { id: 3, name: '五金杂项', icon: '/images/icon_hardware.jpg' },
       { id: 4, name: '常备工具', icon: '/images/icon_tool.jpg' }
     ],
-    goodsList: [] // 修改处：清空这里的假数据，等待接口填充
+    goodsList: [],
+    
+    // --- 新增：弹窗相关数据 ---
+    showSpecPopup: false,
+    currentGoods: null, // 当前选中的商品
+    currentSpec: null,  // 当前选中的规格
+    buyCount: 1,        // 购买数量
+    currentPrice: null  // 当前显示价格
   },
 
   // 点击商品跳转详情
@@ -28,32 +35,76 @@ Page({
     }
   },
 
-  // 新增：首页点击加入购物车
+  // 修改：首页点击加号，弹出规格面板
   onAddToCart(e) {
     const item = e.currentTarget.dataset.item;
     
-    // 如果商品有规格，跳转到详情页让用户选择
-    if (item.has_specs) {
-      wx.navigateTo({
-        url: `/pages/goods_detail/goods_detail?id=${item.id}`
-      });
-      return;
+    // 初始化选中状态
+    let initialSpec = null;
+    let initialPrice = item.price;
+
+    // 如果商品有规格，默认选中第一个
+    if (item.specs && item.specs.length > 0) {
+        initialSpec = item.specs[0];
+        initialPrice = initialSpec.price; // 如果规格有特定价格
     }
 
-    // 如果没有规格，直接调用接口加入购物车（默认标准规格）
-    // 修改处：优先从缓存获取 openid
-    const userId = wx.getStorageSync('openid') || 'test_user'; 
-    
+    this.setData({
+      showSpecPopup: true,
+      currentGoods: item,
+      buyCount: 1,
+      currentSpec: initialSpec,
+      currentPrice: initialPrice
+    });
+  },
+
+  // --- 新增：弹窗交互方法 ---
+
+  // 关闭弹窗
+  closePopup() {
+    this.setData({
+      showSpecPopup: false
+    });
+  },
+
+  // 选择规格
+  selectSpec(e) {
+    const spec = e.currentTarget.dataset.spec;
+    this.setData({
+      currentSpec: spec,
+      currentPrice: spec.price // 更新为规格价格
+    });
+  },
+
+  // 调整数量
+  changeCount(e) {
+    const type = e.currentTarget.dataset.type;
+    let count = this.data.buyCount;
+    if (type === 'minus') {
+      if (count > 1) count--;
+    } else {
+      count++;
+    }
+    this.setData({
+      buyCount: count
+    });
+  },
+
+  // 确认加入购物车
+  confirmAction() {
+    const userId = wx.getStorageSync('openid') || 'test_user';
+    const { currentGoods, buyCount, currentSpec } = this.data;
+
     wx.showLoading({ title: '添加中...' });
-    
+
     wx.request({
       url: 'http://127.0.0.1:8000/hardware_app/cart/add/',
       method: 'POST',
       data: {
         user_id: userId,
-        goods_id: item.id,
-        count: 1,
-        spec_name: '标准规格'
+        goods_id: currentGoods.id,
+        count: buyCount,
+        spec_name: currentSpec ? currentSpec.name : '标准规格'
       },
       success: (res) => {
         wx.hideLoading();
@@ -62,6 +113,7 @@ Page({
             title: '已加入购物车',
             icon: 'success'
           });
+          this.closePopup(); // 成功后关闭弹窗
         } else {
           wx.showToast({ title: '添加失败', icon: 'none' });
         }

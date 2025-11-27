@@ -71,16 +71,25 @@ def goods_list(request):
     data = []
     for g in goods_query:
         img_url = f"http://127.0.0.1:8000/backend/media/{g.img}" if g.img else ""
-        # 判断是否有规格
-        has_specs = g.specs.exists()
         
+        # --- 新增：获取规格列表 ---
+        specs = []
+        for spec in g.specs.all():
+            specs.append({
+                'id': spec.id,
+                'name': spec.name,
+                'price': float(spec.price) if spec.price else float(g.price),
+            })
+        # -----------------------
+
         data.append({
             'id': g.id,
             'name': g.name,
             'price': str(g.price),
             'img': img_url,
             'tag': '热销' if g.is_hot else ('新品' if g.is_new else ''),
-            'has_specs': has_specs # 新增字段
+            'has_specs': len(specs) > 0, # 修改：根据实际规格数量判断
+            'specs': specs # 新增：返回规格数据
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 

@@ -65,4 +65,49 @@
     <!-- 底部留白，防止被TabBar遮挡，增加高度 -->
     <view style="height: 120rpx;"></view>
   </view>
+
+  <!-- --- 新增：规格选择弹出层 --- -->
+  <view class="mask" wx:if="{{showSpecPopup}}" bindtap="closePopup"></view>
+  <view class="spec-popup {{showSpecPopup ? 'show' : ''}}">
+    <view class="popup-header">
+      <image src="{{currentGoods.img}}" mode="aspectFill" class="popup-img"></image>
+      <view class="popup-info">
+        <view class="popup-price">￥{{currentPrice || currentGoods.price}}</view>
+        <view class="popup-selected">已选：{{currentSpec ? currentSpec.name : '标准规格'}}</view>
+      </view>
+      <view class="close-btn" bindtap="closePopup">×</view>
+    </view>
+
+    <scroll-view scroll-y class="popup-content">
+      <view class="spec-section">
+        <view class="section-title">规格</view>
+        <view class="spec-list">
+          <block wx:for="{{currentGoods.specs}}" wx:key="id">
+            <view 
+              class="spec-item {{currentSpec.id === item.id ? 'active' : ''}}" 
+              bindtap="selectSpec" 
+              data-spec="{{item}}">
+              {{item.name}}
+            </view>
+          </block>
+          <!-- 如果没有规格，显示默认 -->
+          <view wx:if="{{!currentGoods.specs || currentGoods.specs.length === 0}}" class="spec-item active">标准规格</view>
+        </view>
+      </view>
+
+      <view class="count-section">
+        <view class="section-title">数量</view>
+        <view class="stepper">
+          <view class="step-btn minus {{buyCount <= 1 ? 'disabled' : ''}}" bindtap="changeCount" data-type="minus">-</view>
+          <input class="step-input" type="number" value="{{buyCount}}" disabled />
+          <view class="step-btn plus" bindtap="changeCount" data-type="plus">+</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="popup-footer">
+      <view class="confirm-btn" bindtap="confirmAction">确定加入</view>
+    </view>
+  </view>
+
 </view>

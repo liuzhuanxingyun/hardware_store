@@ -14,6 +14,7 @@ navigation-bar {
   flex: 1;
   overflow-y: auto;
   padding: 20rpx;
+  box-sizing: border-box; /* 新增：防止 padding 撑大宽度导致溢出 */
 }
 
 /* 地址栏 */
@@ -25,6 +26,7 @@ navigation-bar {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20rpx;
+  box-sizing: border-box; /* 新增：确保内边距不增加总宽度 */
 }
 
 .address-info {
@@ -79,6 +81,7 @@ navigation-bar {
   border-radius: 16rpx;
   padding: 20rpx;
   margin-bottom: 20rpx;
+  box-sizing: border-box; /* 新增：确保内边距不增加总宽度 */
 }
 
 .goods-item {
@@ -103,6 +106,7 @@ navigation-bar {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0; /* 新增：关键属性，防止 flex 子项被长文本撑开超出父容器 */
 }
 
 .goods-name {
@@ -145,6 +149,7 @@ navigation-bar {
   padding: 30rpx;
   display: flex;
   align-items: center;
+  box-sizing: border-box; /* 新增：确保内边距不增加总宽度 */
 }
 
 .remark-box text {

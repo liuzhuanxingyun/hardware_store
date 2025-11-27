@@ -1,0 +1,44 @@
+<view class="container-order-list">
+  <navigation-bar title="我的订单" back="{{true}}" background="#f7f9fb"></navigation-bar>
+
+  <scroll-view scroll-y class="content-scroll">
+    <block wx:for="{{orderList}}" wx:key="id">
+      <view class="order-card">
+        <!-- 订单头部 -->
+        <view class="card-header">
+          <text class="order-time">{{item.created_at}}</text>
+          <text class="order-status">{{item.status}}</text>
+        </view>
+
+        <!-- 商品列表 -->
+        <view class="goods-list">
+          <block wx:for="{{item.items}}" wx:for-item="goods" wx:key="name">
+            <view class="goods-item">
+              <image class="goods-img" src="{{goods.img}}" mode="aspectFill"></image>
+              <view class="goods-info">
+                <view class="goods-name">{{goods.name}}</view>
+                <view class="goods-spec">{{goods.spec}}</view>
+              </view>
+              <view class="goods-price-box">
+                <view class="price">￥{{goods.price}}</view>
+                <view class="count">x{{goods.count}}</view>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <!-- 订单底部 -->
+        <view class="card-footer">
+          <text class="total-count">共{{item.item_count}}件商品</text>
+          <text class="total-label">实付款</text>
+          <text class="total-price">￥{{item.total_price}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view wx:if="{{orderList.length === 0}}" class="empty-state">
+      <text>暂无订单记录</text>
+    </view>
+  </scroll-view>
+</view>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import welcome, banner_list, category_list, goods_list, goods_detail, tabbar_list, add_to_cart, cart_list, update_cart, delete_cart, wechat_login, address_list, address_save, address_delete
+from .views import welcome, banner_list, category_list, goods_list, goods_detail, tabbar_list, add_to_cart, cart_list, update_cart, delete_cart, wechat_login, address_list, address_save, address_delete, submit_order, my_order_list # 记得导入 my_order_list
 
 urlpatterns = [
     path('welcome/', welcome),
@@ -16,4 +16,6 @@ urlpatterns = [
     path('address/list/', address_list),
     path('address/save/', address_save),
     path('address/delete/', address_delete),
+    path('order/submit/', submit_order),
+    path('order/list/', my_order_list), # 新增这一行
 ]

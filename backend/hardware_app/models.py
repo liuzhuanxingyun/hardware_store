@@ -135,3 +135,30 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.name} - {self.phone}"
 
+# 新增：订单模型
+class Order(models.Model):
+    user_id = models.CharField(max_length=100, verbose_name="用户ID")
+    order_no = models.CharField(max_length=50, unique=True, verbose_name="订单号")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="总价")
+    # 关键：存储地址快照，而不是关联ID，防止用户修改地址簿影响历史订单
+    address_snapshot = models.TextField(verbose_name="收货信息快照") 
+    remark = models.CharField(max_length=200, blank=True, verbose_name="备注")
+    status = models.CharField(max_length=20, default='pending', verbose_name="状态") 
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = "订单"
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    goods_name = models.CharField(max_length=200, verbose_name="商品名称")
+    spec_name = models.CharField(max_length=100, verbose_name="规格")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="单价")
+    count = models.PositiveIntegerField(verbose_name="数量")
+    img = models.CharField(max_length=255, blank=True, verbose_name="图片快照")
+
+    def __str__(self):
+        return f"{self.goods_name} x {self.count}"
+

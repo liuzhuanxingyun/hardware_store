@@ -9,7 +9,8 @@
     "pages/goods_detail/goods_detail",
     "pages/order_confirm/order_confirm",
     "pages/address_list/address_list",
-    "pages/address_edit/address_edit"
+    "pages/address_edit/address_edit",
+    "pages/order_list/order_list" 
   ],
   "window": {
     "navigationBarTextStyle": "black",

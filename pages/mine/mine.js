@@ -43,12 +43,14 @@ Page({
   onMenuTap(e) {
     const type = e.currentTarget.dataset.type;
     if (type === 'address') {
-      // 修改：跳转到自定义地址列表页
       wx.navigateTo({
         url: '/pages/address_list/address_list'
       });
     } else if (type === 'orders') {
-      wx.showToast({ title: '暂无订单记录', icon: 'none' });
+      // 修改：跳转到订单列表页
+      wx.navigateTo({
+        url: '/pages/order_list/order_list'
+      });
     } else if (type === 'contact') {
       wx.makePhoneCall({
         phoneNumber: '13800000000' // 替换为你的五金店电话

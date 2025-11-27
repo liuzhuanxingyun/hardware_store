@@ -49,7 +49,10 @@ Page({
   },
 
   getDefaultAddress() {
-    const userId = wx.getStorageSync('openid') || 'test_user';
+    // 移除 || 'test_user'
+    const userId = wx.getStorageSync('openid');
+    if (!userId) return; // 未登录不加载地址
+    
     wx.request({
       url: 'http://127.0.0.1:8000/hardware_app/address/list/',
       data: { user_id: userId },
@@ -133,22 +136,42 @@ Page({
       wx.showToast({ title: '请选择收货地址', icon: 'none' });
       return;
     }
+    
+    const userId = wx.getStorageSync('openid'); // 确保获取到了 openid
+    if (!userId) {
+       wx.showToast({ title: '请先登录', icon: 'none' });
+       return;
+    }
 
     wx.showLoading({ title: '正在提交...' });
 
-    // 模拟提交订单到后端
-    setTimeout(() => {
-      wx.hideLoading();
-      wx.showToast({ title: '下单成功', icon: 'success' });
-
-      // 清除购物车中已购买的商品（这里需要调用后端接口真正删除）
-      // 暂时只清除本地缓存
-      wx.removeStorageSync('checkoutItems');
-
-      // 延迟跳转回首页或订单列表
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/home/home' });
-      }, 1500);
-    }, 1000);
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/order/submit/',
+      method: 'POST',
+      data: {
+        user_id: userId, // 👈 必须确认这一行存在！
+        address: this.data.address,
+        remark: this.data.remark,
+        items: this.data.orderItems
+      },
+      success: (res) => {
+        wx.hideLoading();
+        if (res.data.code === 200) {
+          wx.showToast({ title: '下单成功', icon: 'success' });
+          // 清除本地缓存
+          wx.removeStorageSync('checkoutItems');
+          // 跳转
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/home/home' });
+          }, 1500);
+        } else {
+          wx.showToast({ title: '下单失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({ title: '网络错误', icon: 'none' });
+      }
+    });
   }
 })

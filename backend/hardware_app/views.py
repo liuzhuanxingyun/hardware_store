@@ -3,10 +3,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
-import requests # 记得导入 requests
-from .models import Welcome, Banner, Category, Goods, TabBar, CartItem, Address # 引入 Address
+import requests
+# 引入 Order, OrderItem
+from .models import Welcome, Banner, Category, Goods, TabBar, CartItem, Address, Order, OrderItem
 from dotenv import load_dotenv
 import os
+import datetime
+import random
 
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
@@ -18,31 +21,22 @@ def welcome(request):
     else:
         return JsonResponse({'code': 101, 'msg': '暂无欢迎页图片', 'result': ''})
 
-# 👇 2. 在文件末尾添加这个新函数
 def banner_list(request):
-    # 获取所有 is_active=True 的轮播图，并按 order 从小到大排序
     banners = Banner.objects.filter(is_active=True).order_by('order')
-    
     data = []
     for b in banners:
-        # 拼接完整的图片链接
         if b.img:
-            # 修改处：在字符串前添加 'f'
             img_url = f"http://127.0.0.1:8000/backend/media/{b.img}"
         else:
             img_url = ""
-            
         data.append({
             'id': b.id,
             'img': img_url,
             'title': b.title,
             'link': b.link
         })
-        
-    # 返回 JSON 数据列表
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 1. 获取分类列表
 def category_list(request):
     categories = Category.objects.all().order_by('order')
     data = []
@@ -55,24 +49,17 @@ def category_list(request):
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 2. 获取商品列表 (支持按分类筛选、热销筛选)
 def goods_list(request):
     category_id = request.GET.get('category_id')
     is_hot = request.GET.get('is_hot')
-    
     goods_query = Goods.objects.all()
-    
     if category_id:
         goods_query = goods_query.filter(category_id=category_id)
-    
     if is_hot == 'true':
         goods_query = goods_query.filter(is_hot=True)
-        
     data = []
     for g in goods_query:
         img_url = f"http://127.0.0.1:8000/backend/media/{g.img}" if g.img else ""
-        
-        # --- 新增：获取规格列表 ---
         specs = []
         for spec in g.specs.all():
             specs.append({
@@ -80,26 +67,21 @@ def goods_list(request):
                 'name': spec.name,
                 'price': float(spec.price) if spec.price else float(g.price),
             })
-        # -----------------------
-
         data.append({
             'id': g.id,
             'name': g.name,
             'price': str(g.price),
             'img': img_url,
             'tag': '热销' if g.is_hot else ('新品' if g.is_new else ''),
-            'has_specs': len(specs) > 0, # 修改：根据实际规格数量判断
-            'specs': specs # 新增：返回规格数据
+            'has_specs': len(specs) > 0,
+            'specs': specs
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 3. 获取商品详情
 def goods_detail(request):
     goods_id = request.GET.get('id')
     try:
         goods = Goods.objects.get(id=goods_id)
-        
-        # 获取该商品的所有规格
         specs = []
         for spec in goods.specs.all():
             specs.append({
@@ -108,29 +90,25 @@ def goods_detail(request):
                 'price': float(spec.price) if spec.price else float(goods.price),
                 'stock': spec.stock
             })
-
         data = {
             'id': goods.id,
             'name': goods.name,
             'price': float(goods.price),
             'img': f"http://127.0.0.1:8000/backend/media/{goods.img}" if goods.img else "",
             'description': goods.description,
-            'detailImages': [f"http://127.0.0.1:8000/backend/media/{goods.img}"], # 暂时用主图模拟
-            'specs': specs # 返回规格列表
+            'detailImages': [f"http://127.0.0.1:8000/backend/media/{goods.img}"],
+            'specs': specs
         }
         return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
     except Goods.DoesNotExist:
         return JsonResponse({'code': 404, 'msg': '商品不存在'})
 
-# 4. 获取底部导航栏列表
 def tabbar_list(request):
     tabs = TabBar.objects.filter(is_active=True).order_by('order')
     data = []
     for t in tabs:
-        # 拼接完整图片链接
         icon_url = f"http://127.0.0.1:8000/backend/media/{t.icon}" if t.icon else ""
         selected_icon_url = f"http://127.0.0.1:8000/backend/media/{t.selected_icon}" if t.selected_icon else ""
-        
         data.append({
             'pagePath': t.page_path,
             'text': t.name,
@@ -139,7 +117,6 @@ def tabbar_list(request):
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 新增：用户登录接口
 @csrf_exempt
 def login_user(request):
     if request.method == 'POST':
@@ -150,11 +127,8 @@ def login_user(request):
         except:
             username = request.POST.get('username')
             password = request.POST.get('password')
-
         if not username or not password:
              return JsonResponse({'code': 400, 'msg': '请输入用户名和密码'})
-
-        # 使用 Django 自带的验证功能
         user = authenticate(username=username, password=password)
         if user is not None:
             return JsonResponse({
@@ -164,14 +138,12 @@ def login_user(request):
                     'id': user.id,
                     'username': user.username,
                     'is_superuser': user.is_superuser,
-                    # 这里还可以返回更多信息，比如头像等
                 }
             })
         else:
             return JsonResponse({'code': 401, 'msg': '账号或密码错误'})
     return JsonResponse({'code': 405, 'msg': 'Method not allowed'})
 
-# 5. 添加到购物车
 @csrf_exempt
 def add_to_cart(request):
     if request.method == 'POST':
@@ -179,24 +151,19 @@ def add_to_cart(request):
         goods_id = data.get('goods_id')
         user_id = data.get('user_id', 'test_user')
         count = data.get('count', 1)
-        spec_name = data.get('spec_name', '标准规格') # 获取规格名称
-
+        spec_name = data.get('spec_name', '标准规格')
         try:
-            # 查找是否已有相同商品且相同规格的记录
             item = CartItem.objects.get(user_id=user_id, goods_id=goods_id, spec_name=spec_name)
             item.count += count
             item.save()
         except CartItem.DoesNotExist:
             CartItem.objects.create(user_id=user_id, goods_id=goods_id, count=count, spec_name=spec_name)
-        
         return JsonResponse({'code': 200, 'msg': '加入购物车成功'})
     return JsonResponse({'code': 405, 'msg': '方法不允许'})
 
-# 6. 获取购物车列表
 def cart_list(request):
     user_id = request.GET.get('user_id', 'test_user')
     items = CartItem.objects.filter(user_id=user_id)
-    
     data = []
     for item in items:
         img_url = f"http://127.0.0.1:8000/backend/media/{item.goods.img}" if item.goods.img else ""
@@ -204,16 +171,14 @@ def cart_list(request):
             'id': item.id,
             'goods_id': item.goods.id,
             'name': item.goods.name,
-            'price': float(item.goods.price), # 这里可以优化为取规格对应的价格，如果需要的话
+            'price': float(item.goods.price),
             'img': img_url,
             'num': item.count,
             'selected': item.is_selected,
-            'spec': item.spec_name # 返回规格名称
+            'spec': item.spec_name
         })
-    
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 7. 更新购物车（数量或选中状态）
 @csrf_exempt
 def update_cart(request):
     if request.method == 'POST':
@@ -221,7 +186,6 @@ def update_cart(request):
         cart_id = data.get('cart_id')
         count = data.get('count')
         selected = data.get('selected')
-
         try:
             item = CartItem.objects.get(id=cart_id)
             if count is not None:
@@ -233,7 +197,6 @@ def update_cart(request):
         except CartItem.DoesNotExist:
             return JsonResponse({'code': 404, 'msg': '记录不存在'})
 
-# 8. 删除购物车商品
 @csrf_exempt
 def delete_cart(request):
     if request.method == 'POST':
@@ -242,42 +205,28 @@ def delete_cart(request):
         CartItem.objects.filter(id=cart_id).delete()
         return JsonResponse({'code': 200, 'msg': '删除成功'})
 
-# 9. 微信登录接口
 @csrf_exempt
 def wechat_login(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         code = data.get('code')
-        
         if not code:
             return JsonResponse({'code': 400, 'msg': '缺少code'})
-
-        # 填入你的小程序 AppID 和 AppSecret
         APP_ID = os.getenv('WECHAT_APP_ID')
         APP_SECRET = os.getenv('WECHAT_APP_SECRET')
-        
-        # 微信接口地址
         url = f"https://api.weixin.qq.com/sns/jscode2session?appid={APP_ID}&secret={APP_SECRET}&js_code={code}&grant_type=authorization_code"
-        
         try:
             response = requests.get(url)
             res_data = response.json()
-            
             if 'openid' in res_data:
                 openid = res_data['openid']
-                # 这里可以直接把 openid 当作用户ID返回给前端
-                # 也可以在这里把 openid 存入数据库建立用户档案
                 return JsonResponse({'code': 200, 'msg': '登录成功', 'result': {'openid': openid}})
             else:
                 return JsonResponse({'code': 400, 'msg': '微信接口调用失败', 'error': res_data})
         except Exception as e:
             return JsonResponse({'code': 500, 'msg': '服务器内部错误', 'error': str(e)})
-            
     return JsonResponse({'code': 405, 'msg': '方法不允许'})
 
-# --- 新增：地址管理接口 ---
-
-# 10. 获取地址列表
 def address_list(request):
     user_id = request.GET.get('user_id')
     addresses = Address.objects.filter(user_id=user_id)
@@ -287,14 +236,13 @@ def address_list(request):
             'id': addr.id,
             'name': addr.name,
             'phone': addr.phone,
-            'region': addr.region.split(' '), # 转为数组供前端picker使用
-            'region_str': addr.region,        # 字符串供展示
+            'region': addr.region.split(' '),
+            'region_str': addr.region,
             'detail': addr.detail,
             'is_default': addr.is_default
         })
     return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})
 
-# 11. 保存地址（新增或修改）
 @csrf_exempt
 def address_save(request):
     if request.method == 'POST':
@@ -307,31 +255,120 @@ def address_save(request):
         region = " ".join(region_list) if isinstance(region_list, list) else region_list
         detail = data.get('detail')
         is_default = data.get('is_default', False)
-
-        # 如果设为默认，先将该用户其他地址设为非默认
         if is_default:
             Address.objects.filter(user_id=user_id).update(is_default=False)
-
         if addr_id:
-            # 更新
             Address.objects.filter(id=addr_id).update(
                 name=name, phone=phone, region=region, detail=detail, is_default=is_default
             )
         else:
-            # 新增：如果是第一条地址，强制设为默认
             if not Address.objects.filter(user_id=user_id).exists():
                 is_default = True
-            
             Address.objects.create(
                 user_id=user_id, name=name, phone=phone, region=region, detail=detail, is_default=is_default
             )
-        
         return JsonResponse({'code': 200, 'msg': '保存成功'})
 
-# 12. 删除地址
 @csrf_exempt
 def address_delete(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         Address.objects.filter(id=data.get('id')).delete()
         return JsonResponse({'code': 200, 'msg': '删除成功'})
+
+# 1. 提交订单接口
+@csrf_exempt
+def submit_order(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_id = data.get('user_id')
+            address = data.get('address')
+            remark = data.get('remark', '')
+            items = data.get('items', [])
+
+            if not user_id or not address or not items:
+                return JsonResponse({'code': 400, 'msg': '参数不完整'})
+
+            # 生成唯一订单号
+            order_no = datetime.datetime.now().strftime('%Y%m%d%H%M%S') + str(random.randint(1000, 9999))
+            
+            # 计算总价
+            total_price = 0
+            for item in items:
+                # 注意：前端传过来的可能是字符串，需转float
+                price = float(item.get('price', 0))
+                num = int(item.get('num', 1))
+                total_price += price * num
+
+            # 生成地址快照
+            address_snapshot = f"{address.get('name')} {address.get('phone')} {address.get('region_str', '')} {address.get('detail')}"
+
+            # 创建订单
+            order = Order.objects.create(
+                user_id=user_id,
+                order_no=order_no,
+                total_price=total_price,
+                address_snapshot=address_snapshot,
+                remark=remark
+            )
+
+            # 创建订单明细
+            for item in items:
+                OrderItem.objects.create(
+                    order=order,
+                    goods_name=item.get('name'),
+                    spec_name=item.get('spec', '标准规格'),
+                    price=item.get('price'),
+                    count=item.get('num'),
+                    img=item.get('img', '')
+                )
+
+            # 清空购物车 (可选，根据需求决定是否开启)
+            # CartItem.objects.filter(user_id=user_id).delete() 
+
+            return JsonResponse({'code': 200, 'msg': '下单成功', 'result': {'order_no': order_no}})
+
+        except Exception as e:
+            print(f"下单错误: {e}") 
+            return JsonResponse({'code': 500, 'msg': '服务器错误', 'error': str(e)})
+            
+    return JsonResponse({'code': 405, 'msg': '方法不允许'})
+
+# --- 👇 请务必确认添加了以下代码 👇 ---
+
+def my_order_list(request):
+    """
+    获取我的订单列表
+    """
+    user_id = request.GET.get('user_id')
+    if not user_id:
+        return JsonResponse({'code': 400, 'msg': '缺少用户ID'})
+    
+    # 查询该用户的订单，按时间倒序
+    orders = Order.objects.filter(user_id=user_id).order_by('-created_at')
+    data = []
+    
+    for order in orders:
+        item_list = []
+        # 遍历订单下的商品
+        for item in order.items.all():
+            item_list.append({
+                'name': item.goods_name,
+                'spec': item.spec_name,
+                'price': float(item.price),
+                'count': item.count,
+                'img': item.img
+            })
+            
+        data.append({
+            'id': order.id,
+            'order_no': order.order_no,
+            'status': '待发货' if order.status == 'pending' else '已完成',
+            'total_price': float(order.total_price),
+            'created_at': order.created_at.strftime('%Y-%m-%d %H:%M'),
+            'items': item_list,
+            'item_count': sum(item['count'] for item in item_list)
+        })
+        
+    return JsonResponse({'code': 200, 'msg': '获取成功', 'result': data})

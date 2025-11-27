@@ -1,98 +1,69 @@
 // pages/cart/cart.js
 Page({
   data: {
-    cartList: [
-      { 
-        id: 101, 
-        name: '全铜冷热面盆水龙头', 
-        price: 399, 
-        img: '/images/goods1.png', 
-        num: 1, 
-        selected: true, 
-        spec: '全铜主体' 
-      },
-      { 
-        id: 102, 
-        name: '多功能五金工具箱', 
-        price: 128, 
-        img: '/images/icon_tool.jpg', 
-        num: 1, 
-        selected: false, 
-        spec: '家用套装' 
-      }
-    ],
+    cartList: [],
     allSelected: false,
-    totalPrice: 0
-  },
-
-  onLoad() {
-    // 页面加载时添加测试数据
-    this.addTestData();
+    totalPrice: '0.00'
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 })
     }
-    this.checkAllSelected();
-    this.calculateTotal();
+    this.getCartList();
   },
 
-  // 生成10条假数据用于测试
-  addTestData() {
-    const testItems = [
-      { name: '加厚不锈钢水槽', price: 450, img: '/images/icon_faucet.jpg' },
-      { name: '家用电动螺丝刀', price: 199, img: '/images/icon_tool.jpg' },
-      { name: '防滑耐磨劳保手套', price: 15, img: '/images/icon_material.jpg' },
-      { name: '强力万能胶水', price: 8, img: '/images/icon_hardware.jpg' },
-      { name: '高精度卷尺 5M', price: 25, img: '/images/icon_tool.jpg' },
-      { name: '多功能扳手套装', price: 88, img: '/images/icon_hardware.jpg' },
-      { name: 'LED节能灯泡 10W', price: 12, img: '/images/icon_material.jpg' },
-      { name: '家用插排接线板', price: 45, img: '/images/icon_hardware.jpg' },
-      { name: 'PVC绝缘胶带', price: 5, img: '/images/icon_material.jpg' },
-      { name: '羊角锤', price: 35, img: '/images/icon_tool.jpg' }
-    ];
-
-    const newList = testItems.map((item, index) => ({
-      id: 200 + index, // 生成唯一ID
-      name: item.name,
-      price: item.price,
-      img: item.img,
-      num: 1,
-      selected: false,
-      spec: '标准规格'
-    }));
-
-    this.setData({
-      cartList: [...this.data.cartList, ...newList]
-    });
+  // 获取购物车列表
+  getCartList() {
+    // 修改处：优先从缓存获取 openid
+    const userId = wx.getStorageSync('openid') || 'test_user'; 
     
-    // 数据更新后重新计算状态
-    this.checkAllSelected();
-    this.calculateTotal();
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/cart/list/',
+      data: { user_id: userId },
+      success: (res) => {
+        if (res.data.code === 200) {
+          this.setData({
+            cartList: res.data.result
+          });
+          this.checkAllSelected();
+          this.calculateTotal();
+        }
+      }
+    });
   },
 
-  // 切换单选
+  // 切换单个商品选中状态
   toggleSelect(e) {
     const index = e.currentTarget.dataset.index;
+    const item = this.data.cartList[index];
+    const newSelected = !item.selected;
+    
+    // 乐观更新
     const key = `cartList[${index}].selected`;
-    this.setData({
-      [key]: !this.data.cartList[index].selected
-    });
+    this.setData({ [key]: newSelected });
+    
     this.checkAllSelected();
     this.calculateTotal();
+
+    // 同步后端
+    this.updateCartItem(item.id, { selected: newSelected });
   },
 
-  // 全选/反选
+  // 全选/取消全选
   toggleAllSelect() {
-    const allSelected = !this.data.allSelected;
+    const newAllSelected = !this.data.allSelected;
     const list = this.data.cartList.map(item => {
-      item.selected = allSelected;
-      return item;
+      // 同步后端状态（实际项目中可能需要批量更新接口，这里简化为循环调用或只更新前端显示，结算时再校验）
+      if (item.selected !== newAllSelected) {
+        this.updateCartItem(item.id, { selected: newAllSelected });
+      }
+      return { ...item, selected: newAllSelected };
     });
+
     this.setData({
       cartList: list,
-      allSelected: allSelected
+      allSelected: newAllSelected
     });
     this.calculateTotal();
   },
@@ -107,48 +78,6 @@ Page({
     this.setData({ allSelected });
   },
 
-  // 数量变化
-  updateQuantity(e) {
-    const index = e.currentTarget.dataset.index;
-    const type = e.currentTarget.dataset.type;
-    let num = this.data.cartList[index].num;
-
-    if (type === 'minus' && num > 1) {
-      num--;
-    } else if (type === 'plus') {
-      num++;
-    }
-
-    const key = `cartList[${index}].num`;
-    this.setData({ [key]: num });
-    this.calculateTotal();
-  },
-
-  // 删除商品
-  onDeleteItem(e) {
-    const index = e.currentTarget.dataset.index;
-    wx.showModal({
-      title: '提示',
-      content: '确定要删除这个商品吗？',
-      success: (res) => {
-        if (res.confirm) {
-          const list = this.data.cartList;
-          list.splice(index, 1);
-          this.setData({
-            cartList: list
-          });
-          this.checkAllSelected();
-          this.calculateTotal();
-          
-          wx.showToast({
-            title: '已删除',
-            icon: 'none'
-          });
-        }
-      }
-    });
-  },
-
   // 计算总价
   calculateTotal() {
     let total = 0;
@@ -157,22 +86,98 @@ Page({
         total += item.price * item.num;
       }
     });
-    this.setData({ totalPrice: total });
+    this.setData({
+      totalPrice: total.toFixed(2)
+    });
   },
 
-  onCheckout() {
-    if (this.data.totalPrice === 0) {
-      wx.showToast({ title: '请选择商品', icon: 'none' });
+  // 更新数量
+  updateQuantity(e) {
+    const index = e.currentTarget.dataset.index;
+    const type = e.currentTarget.dataset.type;
+    const item = this.data.cartList[index];
+    let num = item.num;
+
+    if (type === 'minus' && num > 1) {
+      num--;
+    } else if (type === 'plus') {
+      num++;
+    } else {
       return;
     }
-    wx.showToast({ title: '正在前往结算...', icon: 'none' });
+
+    const key = `cartList[${index}].num`;
+    this.setData({ [key]: num });
+    this.calculateTotal();
+
+    this.updateCartItem(item.id, { count: num });
   },
 
+  // 封装更新请求
+  updateCartItem(cartId, data) {
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/cart/update/',
+      method: 'POST',
+      data: { cart_id: cartId, ...data }
+    });
+  },
+
+  // 删除商品
+  onDeleteItem(e) {
+    const index = e.currentTarget.dataset.index;
+    const item = this.data.cartList[index];
+
+    wx.showModal({
+      title: '提示',
+      content: '确定要删除这个商品吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.request({
+            url: 'http://127.0.0.1:8000/hardware_app/cart/delete/',
+            method: 'POST',
+            data: { cart_id: item.id },
+            success: (res) => {
+              if (res.data.code === 200) {
+                const list = this.data.cartList;
+                list.splice(index, 1);
+                this.setData({ cartList: list });
+                this.checkAllSelected();
+                this.calculateTotal();
+                wx.showToast({ title: '已删除', icon: 'none' });
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
+  // 点击商品跳转详情
   onGoodsTap(e) {
     const index = e.currentTarget.dataset.index;
-    const goods = this.data.cartList[index];
+    const item = this.data.cartList[index];
     wx.navigateTo({
-      url: `/pages/goods_detail/goods_detail?id=${goods.id}`
+      url: `/pages/goods_detail/goods_detail?id=${item.goods_id}`
+    });
+  },
+
+  // 去结算
+  onCheckout() {
+    const selectedItems = this.data.cartList.filter(item => item.selected);
+    if (selectedItems.length === 0) {
+      wx.showToast({
+        title: '请选择商品',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 将选中的商品信息存储到本地
+    wx.setStorageSync('checkoutItems', selectedItems);
+    
+    // 跳转到确认订单页面
+    wx.navigateTo({
+      url: '/pages/order_confirm/order_confirm'
     });
   }
 })

@@ -1,0 +1,195 @@
+/* pages/order_confirm/order_confirm.wxss */
+.container-order {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+navigation-bar {
+  flex: none;
+}
+
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20rpx;
+}
+
+/* 地址栏 */
+.address-box {
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.address-info {
+  flex: 1;
+}
+
+.user-row {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.phone {
+  margin-left: 20rpx;
+  color: #666;
+  font-weight: normal;
+}
+
+.address-text {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.4;
+}
+
+.address-empty {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.add-icon {
+  width: 40rpx;
+  height: 40rpx;
+  background: #ff6b00;
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 36rpx;
+  margin-right: 16rpx;
+  font-size: 32rpx;
+}
+
+.arrow {
+  color: #ccc;
+  margin-left: 20rpx;
+}
+
+/* 商品列表 */
+.goods-list {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.goods-item {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+
+.goods-item:last-child {
+  margin-bottom: 0;
+}
+
+.goods-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  background: #f8f8f8;
+}
+
+.goods-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.goods-name {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+}
+
+.goods-spec {
+  font-size: 24rpx;
+  color: #999;
+  background: #f9f9f9;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  align-self: flex-start;
+}
+
+.goods-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.price {
+  color: #ff6b00;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.count {
+  color: #999;
+  font-size: 26rpx;
+}
+
+/* 备注 */
+.remark-box {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+}
+
+.remark-box text {
+  font-size: 28rpx;
+  color: #333;
+  margin-right: 20rpx;
+}
+
+.remark-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 底部栏 */
+.footer-bar {
+  background: #fff;
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.total-info {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.total-price {
+  color: #ff6b00;
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.pay-btn {
+  width: 240rpx;
+  height: 80rpx;
+  background: linear-gradient(90deg, #ff7500, #ff4b00);
+  color: #fff;
+  border-radius: 40rpx;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}

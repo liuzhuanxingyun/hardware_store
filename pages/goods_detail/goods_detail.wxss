@@ -4,27 +4,26 @@
   display: flex;
   flex-direction: column;
   background-color: #f5f5f5;
-  position: relative; /* 确保子元素定位基准 */
+  position: relative;
 }
 
-/* 新增：确保导航栏不被压缩，且层级最高 */
+/* 导航栏：防止被压缩且层级最高 */
 navigation-bar {
-  flex: none; /* 禁止被 Flex 布局压缩 */
-  z-index: 9999; /* 确保在最上层 */
+  flex: none;
+  z-index: 9999;
   position: relative;
 }
 
 .content-scroll {
   flex: 1;
   overflow-y: auto;
-  /* 确保内容在导航栏下方 */
   position: relative;
   z-index: 1;
 }
 
 .detail-swiper {
   width: 100%;
-  height: 750rpx; /* 正方形大图 */
+  height: 750rpx;
   background-color: #fff;
 }
 
@@ -40,8 +39,8 @@ navigation-bar {
 }
 
 .price-row {
-  color: #ff6b00;
-  font-size: 48rpx; /* 价格加大 */
+  color: #ff5000;
+  font-size: 48rpx;
   font-weight: bold;
   margin-bottom: 20rpx;
   display: flex;
@@ -57,7 +56,7 @@ navigation-bar {
   font-size: 34rpx;
   color: #333;
   line-height: 1.5;
-  font-weight: 600; /* 标题加粗 */
+  font-weight: 600;
 }
 
 .detail-box {
@@ -71,7 +70,7 @@ navigation-bar {
   font-weight: bold;
   margin-bottom: 30rpx;
   padding-left: 16rpx;
-  border-left: 8rpx solid #ff6b00;
+  border-left: 8rpx solid #ff5000;
 }
 
 .desc-text {
@@ -85,11 +84,12 @@ navigation-bar {
 .detail-img {
   width: 100%;
   display: block;
-  margin-bottom: 0; /* 图片之间无缝隙 */
+  margin-bottom: 0;
 }
 
+/* 底部操作栏 */
 .bottom-bar {
-  height: 110rpx; /* 稍微加高 */
+  height: 110rpx;
   background-color: #fff;
   display: flex;
   align-items: center;
@@ -143,4 +143,179 @@ navigation-bar {
   background: linear-gradient(90deg, #ff7500, #ff4b00);
   border-top-right-radius: 40rpx;
   border-bottom-right-radius: 40rpx;
+}
+
+/* 遮罩层 */
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+/* 弹出层优化 */
+.spec-popup {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 30rpx 30rpx 0 0; /* 更大的圆角 */
+  z-index: 999;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.spec-popup.show {
+  transform: translateY(0);
+}
+
+.popup-header {
+  display: flex;
+  padding: 30rpx;
+  position: relative;
+  /* 移除 border-bottom，让视觉更连贯 */
+}
+
+.popup-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  margin-right: 24rpx;
+  background-color: #f8f8f8;
+  /* 关键修改：移除负 margin，改为内部布局 */
+}
+
+.popup-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* 底部对齐 */
+  padding-bottom: 10rpx;
+}
+
+.popup-price {
+  color: #ff5000;
+  font-size: 44rpx; /* 价格更大 */
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.popup-selected {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.close-btn {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  font-size: 44rpx;
+  color: #ccc;
+  padding: 10rpx; /* 增加点击区域 */
+  line-height: 1;
+}
+
+.popup-content {
+  max-height: 600rpx;
+  padding: 20rpx 30rpx;
+}
+
+/* 规格区域优化 */
+.spec-section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 24rpx;
+  font-weight: 600;
+  border: none; /* 移除左侧竖线，更简洁 */
+  padding-left: 0;
+}
+
+.spec-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.spec-item {
+  padding: 12rpx 36rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #333;
+  margin-right: 24rpx;
+  margin-bottom: 24rpx;
+  border: 1px solid #f5f5f5; /* 预留边框位置 */
+  transition: all 0.2s;
+}
+
+.spec-item.active {
+  background: #fff5f0; /* 浅橙色背景 */
+  color: #ff5000;
+  border-color: #ff5000;
+}
+
+/* 数量区域优化 */
+.count-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+  margin-top: 20rpx;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5; /* 整体灰色背景 */
+  border-radius: 8rpx;
+  padding: 4rpx;
+}
+
+.step-btn {
+  width: 60rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.step-btn.disabled {
+  color: #ccc;
+}
+
+.step-input {
+  width: 80rpx;
+  height: 56rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.popup-footer {
+  padding: 20rpx 30rpx;
+  box-shadow: 0 -4rpx 16rpx rgba(0,0,0,0.05); /* 增加阴影 */
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #ff9000, #ff5000);
+  color: #fff;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  letter-spacing: 2rpx;
 }

@@ -28,6 +28,51 @@ Page({
     }
   },
 
+  // 新增：首页点击加入购物车
+  onAddToCart(e) {
+    const item = e.currentTarget.dataset.item;
+    
+    // 如果商品有规格，跳转到详情页让用户选择
+    if (item.has_specs) {
+      wx.navigateTo({
+        url: `/pages/goods_detail/goods_detail?id=${item.id}`
+      });
+      return;
+    }
+
+    // 如果没有规格，直接调用接口加入购物车（默认标准规格）
+    // 修改处：优先从缓存获取 openid
+    const userId = wx.getStorageSync('openid') || 'test_user'; 
+    
+    wx.showLoading({ title: '添加中...' });
+    
+    wx.request({
+      url: 'http://127.0.0.1:8000/hardware_app/cart/add/',
+      method: 'POST',
+      data: {
+        user_id: userId,
+        goods_id: item.id,
+        count: 1,
+        spec_name: '标准规格'
+      },
+      success: (res) => {
+        wx.hideLoading();
+        if (res.data.code === 200) {
+          wx.showToast({
+            title: '已加入购物车',
+            icon: 'success'
+          });
+        } else {
+          wx.showToast({ title: '添加失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({ title: '网络错误', icon: 'none' });
+      }
+    });
+  },
+
   // 点击分类
   onCategoryTap(e) {
     const id = e.currentTarget.dataset.id;

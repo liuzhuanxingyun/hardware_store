@@ -1,0 +1,56 @@
+<!--pages/order_confirm/order_confirm.wxml-->
+<view class="container-order">
+  <navigation-bar title="确认订单" back="{{true}}" background="#f7f9fb"></navigation-bar>
+
+  <scroll-view scroll-y class="content-scroll">
+    <!-- 地址栏 -->
+    <view class="address-box" bindtap="chooseAddress">
+      <view class="address-info" wx:if="{{address}}">
+        <view class="user-row">
+          <text class="name">{{address.userName}}</text>
+          <text class="phone">{{address.telNumber}}</text>
+        </view>
+        <view class="address-text">
+          {{address.provinceName}}{{address.cityName}}{{address.countyName}}{{address.detailInfo}}
+        </view>
+      </view>
+      <view class="address-empty" wx:else>
+        <view class="add-icon">+</view>
+        <text>请选择收货地址</text>
+      </view>
+      <view class="arrow">></view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="goods-list">
+      <block wx:for="{{orderItems}}" wx:key="id">
+        <view class="goods-item">
+          <image class="goods-img" src="{{item.img}}" mode="aspectFill"></image>
+          <view class="goods-info">
+            <view class="goods-name">{{item.name}}</view>
+            <view class="goods-spec">{{item.spec}}</view>
+            <view class="goods-bottom">
+              <view class="price">￥{{item.price}}</view>
+              <view class="count">x{{item.num}}</view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 订单备注 -->
+    <view class="remark-box">
+      <text>备注</text>
+      <input class="remark-input" placeholder="选填，给商家留言" bindinput="onRemarkInput" />
+    </view>
+  </scroll-view>
+
+  <!-- 底部结算栏 -->
+  <view class="footer-bar">
+    <view class="total-info">
+      <text>合计：</text>
+      <text class="total-price">￥{{totalPrice}}</text>
+    </view>
+    <view class="pay-btn" bindtap="submitOrder">提交订单</view>
+  </view>
+</view>

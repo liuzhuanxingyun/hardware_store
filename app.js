@@ -1,6 +1,39 @@
 // app.js
 App({
+  globalData: {
+    userInfo: null,
+    openid: null, // 存储 openid
+    categoryIndex: 0
+  },
+
   onLaunch() {
+    // 登录
+    wx.login({
+      success: res => {
+        if (res.code) {
+          // 发送 res.code 到后台换取 openId
+          wx.request({
+            url: 'http://127.0.0.1:8000/hardware_app/user/login/',
+            method: 'POST',
+            data: {
+              code: res.code
+            },
+            success: (response) => {
+              if (response.data.code === 200) {
+                const openid = response.data.result.openid;
+                this.globalData.openid = openid;
+                // 存入本地缓存，方便其他页面调用
+                wx.setStorageSync('openid', openid);
+                console.log('登录成功，OpenID:', openid);
+              }
+            }
+          })
+        } else {
+          console.log('登录失败！' + res.errMsg)
+        }
+      }
+    })
+
     // 请求后端获取 TabBar 配置
     wx.request({
       url: 'http://127.0.0.1:8000/hardware_app/tabbar/list/', 
@@ -17,8 +50,5 @@ App({
         }
       }
     });
-  },
-  globalData: {
-    categoryIndex: null // 用于跨页面传递分类索引
   }
 })

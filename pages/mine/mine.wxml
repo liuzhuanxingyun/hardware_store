@@ -1,52 +1,31 @@
 <!--pages/mine/mine.wxml-->
 <view class="container-mine">
-  <!-- 1. 顶部用户信息区域 (点击可触发登录) -->
-  <view class="user-header" bindtap="onHeaderTap">
-    <!-- 显示头像：已登录显示用户头像，未登录显示默认图 -->
-    <image class="avatar" src="{{hasUserInfo ? (userInfo.avatarUrl || '/images/launch.jpg') : '/images/launch.jpg'}}" mode="aspectFill"></image>
+  <!-- 1. 顶部用户信息区域 -->
+  <view class="user-header">
+    <!-- 头像 -->
+    <view class="avatar-box">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+    </view>
     
     <view class="user-info-box">
-      <!-- 显示昵称：已登录显示昵称，未登录显示提示 -->
-      <view class="nickname">{{hasUserInfo ? userInfo.nickName : '点击登录账户'}}</view>
-      
-      <!-- 登录状态提示 -->
-      <view class="login-tip" wx:if="{{hasUserInfo}}" catchtap="doLogout">退出登录</view>
-      <view class="login-tip" wx:else>登录以享受更多服务</view>
+      <!-- 昵称 -->
+      <view class="nickname">{{userInfo.nickName}}</view>
+      <!-- ID展示 (可选，显示OpenID后4位作为识别码) -->
+      <view class="user-id" wx:if="{{userId}}">ID: {{userId}}</view>
     </view>
   </view>
 
   <!-- 2. 菜单列表 -->
-  <view class="menu-card" style="margin-top: -80rpx;">
+  <view class="menu-card">
     <block wx:for="{{menuList}}" wx:key="name">
       <view class="menu-item" bindtap="onMenuTap" data-type="{{item.type}}">
         <view class="menu-left">
+          <!-- 注意：请确保这些图标图片存在，否则无法显示 -->
           <image class="menu-icon" src="{{item.icon}}" mode="aspectFit"></image>
           <text class="menu-name">{{item.name}}</text>
         </view>
         <text class="arrow-right">></text>
       </view>
     </block>
-  </view>
-
-  <!-- 3. 登录弹窗 (Modal) -->
-  <view class="modal-mask" wx:if="{{showLoginModal}}" bindtap="closeLoginModal">
-    <view class="modal-content" catchtap="preventBubble">
-      <view class="modal-header">
-        <text class="modal-title">欢迎回来</text>
-        <text class="modal-subtitle">请输入您的账号密码</text>
-      </view>
-      
-      <view class="login-form">
-        <view class="input-row">
-          <text class="label">账号</text>
-          <input class="input" placeholder="请输入账号" placeholder-class="ph-color" bindinput="onInputUsername" value="{{username}}" />
-        </view>
-        <view class="input-row">
-          <text class="label">密码</text>
-          <input class="input" password type="text" placeholder="请输入密码" placeholder-class="ph-color" bindinput="onInputPassword" value="{{password}}" />
-        </view>
-        <button class="login-btn" bindtap="doLogin">立即登录</button>
-      </view>
-    </view>
   </view>
 </view>

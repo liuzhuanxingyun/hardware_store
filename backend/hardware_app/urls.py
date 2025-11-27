@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import welcome, banner_list, category_list, goods_list, goods_detail, tabbar_list, login_user # 记得引入 login_user
+from .views import welcome, banner_list, category_list, goods_list, goods_detail, tabbar_list, add_to_cart, cart_list, update_cart, delete_cart, wechat_login
 
 urlpatterns = [
     path('welcome/', welcome),
@@ -8,5 +8,9 @@ urlpatterns = [
     path('goods/list/', goods_list),
     path('goods/detail/', goods_detail),
     path('tabbar/list/', tabbar_list),
-    path('login/', login_user),
+    path('cart/add/', add_to_cart),
+    path('cart/list/', cart_list),
+    path('cart/update/', update_cart),
+    path('cart/delete/', delete_cart),
+    path('user/login/', wechat_login),
 ]

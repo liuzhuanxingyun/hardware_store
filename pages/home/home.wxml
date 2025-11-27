@@ -54,7 +54,8 @@
               <view class="goods-price">
                 <text class="symbol">￥</text>{{item.price}}
               </view>
-              <view class="add-btn">+</view>
+              <!-- 修改处：添加 catchtap 事件 -->
+              <view class="add-btn" catchtap="onAddToCart" data-item="{{item}}">+</view>
             </view>
           </view>
         </view>

@@ -87,7 +87,7 @@ Page({
       }
     });
     this.setData({
-      totalPrice: total.toFixed(2)
+      totalPrice: total.toFixed(3)
     });
   },
 

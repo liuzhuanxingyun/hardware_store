@@ -54,7 +54,7 @@ class Category(models.Model):
 class Goods(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='goods', verbose_name="所属分类")
     name = models.CharField(max_length=200, verbose_name="商品名称")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="价格")
+    price = models.DecimalField(max_digits=10, decimal_places=3, verbose_name="价格")
     img = models.ImageField(upload_to='goods/', default='goods/default.png', verbose_name="主图")
     description = models.TextField(verbose_name="商品详情", blank=True)
     stock = models.PositiveIntegerField(default=100, verbose_name="库存")
@@ -74,7 +74,7 @@ class Goods(models.Model):
 class GoodsSpec(models.Model):
     goods = models.ForeignKey(Goods, on_delete=models.CASCADE, related_name='specs', verbose_name="所属商品")
     name = models.CharField(max_length=100, verbose_name="规格名称") # 例如：直径10mm, 红色
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="规格价格", blank=True, null=True, help_text="如果不填则使用商品默认价格")
+    price = models.DecimalField(max_digits=10, decimal_places=3, verbose_name="规格价格", blank=True, null=True, help_text="如果不填则使用商品默认价格")
     stock = models.PositiveIntegerField(default=100, verbose_name="库存")
 
     class Meta:
